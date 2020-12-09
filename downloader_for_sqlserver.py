@@ -32,19 +32,18 @@ def get_points_definition_from_server(ip,user,password):
             return name_dict
 
 def export_data_to_csv(data,keys,name_dict,location_str,location,month):
-    data_to_csv = pd.DataFrame()
-    count = 0
-    for row in tqdm.tqdm(data):
-        for column_key in keys:
-            if (column_key == '年')|(column_key == '月')|(column_key == '日')|(column_key == 'SerialNumber')|(column_key == 'IDX'):
-                data_to_csv.loc[count,column_key] = row[column_key]
-            elif (column_key == 'AI0')|(column_key == 'AI1')|(column_key == 'AI2')|(column_key == 'AI3')|(column_key == 'AI4')|(column_key == 'AI5')| \
-                (column_key == 'AI6')|(column_key == 'AI7')|(column_key == 'AI8')|(column_key == 'AI9'):
-                data_to_csv.loc[count,name_dict[location_str + column_key[:2] + '0' + column_key[-1]]] = row[column_key] 
+    for key_index in range(len(keys)):
+            if (keys[key_index] == 'AI0')|(keys[key_index] == 'AI1')|(keys[key_index] == 'AI2')|(keys[key_index] == 'AI3')|(keys[key_index] == 'AI4')|(keys[key_index] == 'AI5')| \
+                (keys[key_index] == 'AI6')|(keys[key_index] == 'AI7')|(keys[key_index] == 'AI8')|(keys[key_index] == 'AI9'):
+                keys[key_index] = name_dict[location_str + keys[key_index][:2] + '0' + keys[key_index][-1]]
+            elif (keys[key_index] == '年')|(keys[key_index] == '月')|(keys[key_index] == '日')|(keys[key_index] == 'SerialNumber')|(keys[key_index] == 'IDX'):
+                pass
             else:
-                data_to_csv.loc[count,name_dict[location_str+column_key]] = row[column_key]
-        count += 1
-    
+                keys[key_index] = name_dict[location_str+keys[key_index]]
+    data_to_csv = pd.DataFrame(columns=keys)
+    for row in tqdm.tqdm(data):
+        row = pd.Series(list(row.values()),index=keys)
+        data_to_csv = data_to_csv.append(row,ignore_index=True)
     file_name = str(location) + '#站历史曲线M' + str(month)
     print('\n导出文件：' + file_name + '\n')
     data_to_csv.to_csv(file_name +'.csv',encoding='GBK',index=False)
