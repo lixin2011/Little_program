@@ -31,8 +31,9 @@ def get_points_definition_from_server(ip,user,password):
                 name_dict[row['PointName']] = row['PointAlias']
             return name_dict
 
-def export_data_to_csv(data,keys,name_dict,location_str,location,month):
+def export_data_to_csv(data,keys,name_dict,location_str,location,month):    
     for key_index in range(len(keys)):
+        try:
             if (keys[key_index] == 'AI0')|(keys[key_index] == 'AI1')|(keys[key_index] == 'AI2')|(keys[key_index] == 'AI3')|(keys[key_index] == 'AI4')|(keys[key_index] == 'AI5')| \
                 (keys[key_index] == 'AI6')|(keys[key_index] == 'AI7')|(keys[key_index] == 'AI8')|(keys[key_index] == 'AI9'):
                 keys[key_index] = name_dict[location_str + keys[key_index][:2] + '0' + keys[key_index][-1]]
@@ -40,6 +41,9 @@ def export_data_to_csv(data,keys,name_dict,location_str,location,month):
                 pass
             else:
                 keys[key_index] = name_dict[location_str+keys[key_index]]
+        except KeyError as e:
+            print('未查找到该点定义：',e)
+
     data_to_csv = pd.DataFrame(columns=keys)
     for row in tqdm.tqdm(data):
         row = pd.Series(list(row.values()),index=keys)
@@ -54,7 +58,7 @@ if __name__ == "__main__":
     password = input('输入密码： ')
     print('\n----------  开始传输数据  ----------\n')
     name_dict = get_points_definition_from_server(ip,user,password)
-    for location in range(1,35):
+    for location in range(18,35):
         for month in range(1,13):
             location_str = '{:0>2s}'.format(str(location))
             all_data,keys = get_data_from_server(location,month,ip,user,password)
