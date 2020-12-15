@@ -58,7 +58,7 @@ if __name__ == "__main__":
         result = resolve_data(data)
         results = pd.concat([results,result])
         try:
-            results.to_csv('lagou_'+keyword+'_'+str(start_page)+'_'+str(end_page)+'.csv',index=False,encoding='GBK')
+            results.to_csv('lagou_'+keyword+'_'+str(start_page)+'_'+str(end_page)+'.csv',index=False,encoding='gb18030')
         except UnicodeEncodeError as e:
             print(e)
         time.sleep(20)
